@@ -106,8 +106,20 @@ function handleGalleryClick(e) {
 
 function openModal(imageURL, altText) {
   const instance = basicLightbox.create(`
-        <img src="${imageURL}" alt="${altText}">
-    `);
+    <img src="${imageURL}" alt="${altText}">
+  `, {
+    onShow: (instance) => {
+      document.addEventListener('keydown', onEscKey);
+    },
+    onClose: (instance) => {
+      document.removeEventListener('keydown', onEscKey);
+    },
+  });
+  function onEscKey(e) {
+    if (e.key === 'Escape') {
+      instance.close();
+    }
+  }
   instance.show();
 }
 
