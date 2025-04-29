@@ -66,11 +66,11 @@ const images = [
 
 const imagesContainer = document.querySelector('.gallery');
 
-function imageTmp(image) {
-  return `<li class="gallery__item">
-    <a class="gallery__link" href="${image.original}">
+function createGalleryItem(image) {
+  return `<li class="gallery-item">
+    <a class="gallery-link" href="${image.original}">
       <img
-        class="gallery__image"
+        class="gallery-image"
         src="${image.preview}"
         data-source="${image.original}"
         alt="${image.description}"
@@ -79,13 +79,40 @@ function imageTmp(image) {
   </li>`;
 }
 
-function imagesTmp(images) {
-  return images.map(imageTmp).join('');
+function renderGallery() {
+  if (!imagesContainer) {
+    console.error("Gallery container '.gallery' not found.");
+    return;
+  }
+  const markup = images.map(createGalleryItem).join('');
+  imagesContainer.innerHTML = markup;
 }
 
-function createGallery() {
-  const markup = imagesTmp(images);
-  imagesContainer.insertAdjacentHTML('beforeend', markup);
+function handleGalleryClick(e) {
+  const galleryLink = e.target.closest('.gallery-link');
+  if (!galleryLink) {
+    return;
+  }
+
+  e.preventDefault();
+
+  const imageElement = galleryLink.querySelector('.gallery-image');
+  if (imageElement && imageElement.dataset.source) {
+    const largeImageURL = imageElement.dataset.source;
+    const imageDescription = imageElement.alt || 'Image';
+    openModal(largeImageURL, imageDescription);
+  }
 }
 
-createGallery();
+function openModal(imageURL, altText) {
+  const instance = basicLightbox.create(`
+        <img src="${imageURL}" alt="${altText}">
+    `);
+  instance.show();
+}
+
+renderGallery();
+
+if (imagesContainer) {
+  imagesContainer.addEventListener('click', handleGalleryClick);
+}
